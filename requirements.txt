@@ -1,0 +1,9 @@
+numpy
+matplotlib
+pandas
+torch
+scikit-learn
+anthropic
+jupyter
+nbformat
+pytest
