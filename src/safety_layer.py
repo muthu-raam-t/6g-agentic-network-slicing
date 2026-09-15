@@ -11,6 +11,7 @@ of its inputs.
 
 from __future__ import annotations
 
+import math
 from typing import Dict, List, Optional
 
 from schemas import AllocationPlan, NetworkRules, SliceState, ValidationResult
@@ -39,9 +40,13 @@ def validate_schema(raw: dict) -> ValidationResult:
         return ValidationResult(False, "'allocations' must be a non-empty object", "schema")
 
     for slice_name, value in raw["allocations"].items():
-        if not isinstance(value, (int, float)):
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
             return ValidationResult(
                 False, f"allocation for '{slice_name}' must be numeric, got {type(value).__name__}", "schema"
+            )
+        if not math.isfinite(value):
+            return ValidationResult(
+                False, f"allocation for '{slice_name}' is not a finite number ({value})", "schema"
             )
 
     if not isinstance(raw["reasoning"], str) or not raw["reasoning"].strip():
