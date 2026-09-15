@@ -117,7 +117,17 @@ export ANTHROPIC_API_KEY="your-key-here"
 │   ├── agent_planner.py
 │   ├── digital_twin.py
 │   ├── forecaster.py
+│   ├── reference_llm.py
+│   ├── live_pipeline.py
 │   └── baseline_agents.py
+├── tests/
+│   ├── test_safety_layer.py
+│   ├── test_safety_layer_adversarial.py
+│   ├── test_digital_twin.py
+│   ├── test_forecaster.py
+│   ├── test_reference_llm.py
+│   ├── test_live_pipeline.py
+│   └── test_baseline_agents.py
 ├── images/
 │   └── system_architecture.svg
 ├── results/
@@ -125,3 +135,38 @@ export ANTHROPIC_API_KEY="your-key-here"
 ```
 
 Each notebook after `00_overview.ipynb` holds explanation and math; the matching file in `src/` holds the real, runnable implementation.
+
+## Running the Tests
+
+Every implemented `src/*.py` module has a matching test file in `tests/`. Run the full suite from the repo root:
+
+```bash
+PYTHONPATH=src pytest tests/ -v
+```
+
+You can also run any `src/*.py` file directly for a quick self-test (no pytest needed), e.g.:
+
+```bash
+cd src && python3 agent_planner.py
+```
+
+## Current Status
+
+**Complete.** All 7 stages built, tested, and passing.
+
+| Stage | Notebook | Source | Status |
+|---|---|---|---|
+| 0 | `00_overview.ipynb` | — | Done |
+| 1 | `01_agent_overview.ipynb` | `agent_planner.py`, `safety_layer.py`, `schemas.py` | Done, 9 tests |
+| 2 | `02_digital_twin.ipynb` | `digital_twin.py` | Done, 10 tests |
+| 3 | `03_forecaster.ipynb` | `forecaster.py` | Done, 7 tests |
+| 4 | `04_agentic_planner.ipynb` | `agent_planner.py`, `live_pipeline.py`, `reference_llm.py` | Done, 3 + 4 tests |
+| 5 | `05_safety_layer.ipynb` | `safety_layer.py` (adversarial) | Done, 5 tests |
+| 6 | `06_baseline_comparison.ipynb` | `baseline_agents.py` | Done, 5 tests |
+| 7 | `07_results_and_report.ipynb` | — | Done |
+
+**43 tests pass across the whole repo.** Run `PYTHONPATH=src pytest tests/ -v` from the repo root.
+
+**Headline result** (reference/offline LLM stand-in, not a real API call — see `src/reference_llm.py`): the Live Agentic System reduces the URLLC QoS violation rate by ~59% vs. a static baseline and ~95% vs. a reactive legacy-behaviour agent, on identical synthetic traffic, at a real and explicitly quantified ~14.5% eMBB throughput cost. Full numbers reproduced live in `notebooks/07_results_and_report.ipynb`.
+
+To run the live agentic planner against a real LLM instead of the offline reference stand-in, see `src/reference_llm.py :: real_anthropic_llm_call()` (requires `pip install anthropic` and `ANTHROPIC_API_KEY`).
